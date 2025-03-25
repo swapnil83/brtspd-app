@@ -1,26 +1,45 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Provider } from "react-redux";
-import { Button } from "@mui/material";
+import { useDispatch } from "react-redux";
+
 import "./styles.scss";
-import store from "./redux/store";
+import Header from "./common/Header/Header";
+import axiosInstance from "./https/axiosInstance";
+import { AppDispatch } from "./redux/store";
+import { setUser } from "./redux/slices/authSlice";
+import Dashboard from "./common/Dashboard/Dashboard";
 
-const Home = () => <h1>🏡 Home Page</h1>;
-const About = () => <h1>ℹ️ About Page</h1>;
+const App: React.FC = () => {
+    const dispatch = useDispatch<AppDispatch>();
 
-const App: React.FC = () => (
-    <Provider store={store}>
+    useEffect(() => {
+        async function fetchUserDetails() {
+            try {
+                const response = await axiosInstance.get("/user-details");
+                const { username, email, roles } = response.data.data;
+
+                dispatch(setUser({ username, email, roles, isAuthenticated: true }));
+            } catch (error) {
+                console.error("Failed to fetch user details:", error);
+            }
+        };
+
+        fetchUserDetails();
+    }, []);
+
+    return (
         <BrowserRouter>
             <div>
-                <h1>React + TypeScript + Webpack Setup 🎉</h1>
-                <Button variant="contained" color="primary">Material UI Button</Button>
+                <Header />
+
                 <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/about" element={<About />} />
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/default-capacity" element={<h1>⚙️ Default Capacity</h1>} />
+                    <Route path="/due-date-management" element={<h1>📅 Due Date Management</h1>} />
                 </Routes>
             </div>
         </BrowserRouter>
-    </Provider>
-);
+    )
+};
 
 export default App;

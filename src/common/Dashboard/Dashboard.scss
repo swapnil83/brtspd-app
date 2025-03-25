@@ -1,0 +1,36 @@
+.tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 400px;
+    height: 200px;
+    border: 1px solid #DDDDDD;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    background-color: #FFC800;
+  
+    .tile-title {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #333333;
+    }
+  
+    .tile-description {
+      color: #666666;
+    }
+  
+    &:hover {
+      background-color: #000000;
+      transform: translateY(-5px);
+  
+      .tile-title,
+      .tile-description,
+      svg {
+        color: #FFFFFF;
+      }
+    }
+  }
+  
