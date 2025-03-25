@@ -1,11 +1,14 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
 module.exports = {
     entry: "./src/index.tsx",
     output: {
         path: path.resolve(__dirname, "dist"),
-        filename: "bundle.js",
+        filename: "bundle.[contenthash].js",
         clean: true,
     },
     resolve: {
@@ -36,11 +39,42 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: "./src/index.html",
         }),
+        new MiniCssExtractPlugin({
+            filename: "[name].[contenthash].css",
+        }),
     ],
+    optimization: {
+        minimize: true,
+        minimizer: [
+            new TerserPlugin({
+                parallel: true,
+                terserOptions: {
+                    compress: {
+                        drop_console: true,
+                    },
+                },
+            }),
+            new CssMinimizerPlugin(),
+        ],
+        splitChunks: {
+            chunks: "all",
+            cacheGroups: {
+                vendor: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: "vendors",
+                    chunks: "all",
+                },
+            },
+        },
+        runtimeChunk: "single",
+    },
+    devtool: "source-map",
     devServer: {
         static: path.join(__dirname, "dist"),
         compress: true,
         port: 3000,
         historyApiFallback: true,
+        hot: true,
+        open: true,
     },
 };
